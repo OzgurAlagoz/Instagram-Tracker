@@ -34,23 +34,20 @@ def jsonSkeletonWrite():
     try:
         with open(mainFile, "r+", encoding="utf-8") as newfile:
             try:
-                file_data = json.load(newfile)  # Var olan JSON'u oku
+                file_data = json.load(newfile)
             except json.JSONDecodeError:
-                file_data = {}  # Boş veya hatalı JSON varsa yeni oluştur
+                file_data = {}
 
-            # Eğer 'followers' ve 'following' yoksa, ekle
             if "followers" not in file_data:
                 file_data["followers"] = []
             if "following" not in file_data:
                 file_data["following"] = []
 
-            # Baştan yazmak için dosyayı temizle
             newfile.seek(0)
             json.dump(file_data, newfile, indent=4, ensure_ascii=False)
-            newfile.truncate()  # Önceki verilerin kalıntılarını temizle
+            newfile.truncate()
 
     except FileNotFoundError:
-        # Dosya yoksa, yeni bir dosya oluştur ve skeleton yaz
         with open(mainFile, "w", encoding="utf-8") as newfile:
             json.dump({"followers": [], "following": []}, newfile, indent=4, ensure_ascii=False)
 
@@ -75,14 +72,12 @@ def update_json(new_data, new_data2, dataname, dataname2, filename=mainFile):
     removed_entries = {entry["username"] for entry in file_data[dataname] if entry["username"] not in new_data_usernames}
     removed_entries2 = {entry2["username"] for entry2 in file_data[dataname2] if entry2["username"] not in new_data_usernames2}
 
-    # Silinmesi gerekenleri çıkar ve yeni verileri ekle
     file_data[dataname] = [entry for entry in file_data[dataname] if entry["username"] not in removed_entries]
     file_data[dataname].extend(new_entries)
 
     file_data[dataname2] = [entry2 for entry2 in file_data[dataname2] if entry2["username"] not in removed_entries2]
     file_data[dataname2].extend(new_entries2)
 
-    # Güncellenmiş JSON'u dosyaya yaz
     with open(filename, 'w', encoding='utf-8') as file:
         json.dump(file_data, file, indent=4, ensure_ascii=False)
     
